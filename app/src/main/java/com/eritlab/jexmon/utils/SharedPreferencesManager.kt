@@ -43,6 +43,11 @@ class SharedPreferencesManager(context: Context) {
             editor.putString(KEY_PASSWORD, value).apply()
         }
 
+    fun clear() {
+        editor.clear()
+        editor.commit()
+    }
+
     companion object {
         private const val PREFS_NAME = "user_prefs"
         private const val KEY_FIRST_NAME = "first_name"

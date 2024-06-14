@@ -55,7 +55,10 @@ fun SignUpScreen(navController: NavController) {
     val addressErrorState = remember { mutableStateOf(false) }
     val animate = remember { mutableStateOf(true) }
 
-    val sharedPreferencesManager = SharedPreferencesManager.getInstance(LocalContext.current)
+    val context = LocalContext.current
+    val sharedPreferencesManager = remember {
+        SharedPreferencesManager.getInstance(context)
+    }
 
     AnimatedContent(targetState = animate.value, transitionSpec = {
         slideInHorizontally(

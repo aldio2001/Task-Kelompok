@@ -42,7 +42,10 @@ fun LoginScreen(navController: NavController) {
     val emailErrorState = remember { mutableStateOf(false) }
     val passwordErrorState = remember { mutableStateOf(false) }
 
-    val sharedPreferencesManager = SharedPreferencesManager.getInstance(LocalContext.current)
+    val context = LocalContext.current
+    val sharedPreferencesManager = remember {
+        SharedPreferencesManager.getInstance(context)
+    }
 
     Column(
         modifier = Modifier
