@@ -10,6 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,22 +32,17 @@ import com.eritlab.jexmon.presentation.graphs.auth_graph.AuthScreen
 import com.eritlab.jexmon.presentation.ui.theme.PrimaryColor
 import com.eritlab.jexmon.presentation.ui.theme.PrimaryLightColor
 import com.eritlab.jexmon.presentation.ui.theme.TextColor
-
+import com.eritlab.jexmon.utils.SharedPreferencesManager
 
 @Composable
 fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
-    var checkBox by remember {
-        mutableStateOf(false)
-    }
-    val emailErrorState = remember {
-        mutableStateOf(false)
-    }
-    val passwordErrorState = remember {
-        mutableStateOf(false)
-    }
+    var checkBox by remember { mutableStateOf(false) }
+    val emailErrorState = remember { mutableStateOf(false) }
+    val passwordErrorState = remember { mutableStateOf(false) }
 
+    val sharedPreferencesManager = SharedPreferencesManager.getInstance(LocalContext.current)
 
     Column(
         modifier = Modifier
@@ -59,8 +55,7 @@ fun LoginScreen(navController: NavController) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
-        )
-        {
+        ) {
             Box(modifier = Modifier.weight(0.7f)) {
                 DefaultBackArrow {
                     navController.popBackStack()
@@ -69,8 +64,6 @@ fun LoginScreen(navController: NavController) {
             Box(modifier = Modifier.weight(1.0f)) {
                 Text(text = "Sign in", color = MaterialTheme.colors.TextColor, fontSize = 18.sp)
             }
-
-
         }
         Spacer(modifier = Modifier.height(50.dp))
         Text(text = "Welcome Back", fontSize = 26.sp, fontWeight = FontWeight.Bold)
@@ -109,7 +102,7 @@ fun LoginScreen(navController: NavController) {
             ErrorSuggestion("Please enter valid email address.")
         }
         if (passwordErrorState.value) {
-            Row{
+            Row {
                 ErrorSuggestion("Please enter valid password.")
             }
         }
@@ -120,7 +113,6 @@ fun LoginScreen(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     checked = checkBox, onCheckedChange = {
@@ -147,6 +139,11 @@ fun LoginScreen(navController: NavController) {
             emailErrorState.value = !isEmailValid
             passwordErrorState.value = !isPassValid
             if (isEmailValid && isPassValid) {
+                // Save email and password if checkbox is checked
+                if (checkBox) {
+                    sharedPreferencesManager.email = email.text
+                    sharedPreferencesManager.password = password.text
+                }
                 navController.navigate(AuthScreen.SignInSuccess.route)
             }
         }
@@ -211,7 +208,6 @@ fun LoginScreen(navController: NavController) {
                         contentDescription = "Facebook Login Icon"
                     )
                 }
-
             }
             Row(
                 modifier = Modifier
@@ -228,9 +224,5 @@ fun LoginScreen(navController: NavController) {
                     })
             }
         }
-
-
     }
 }
-
-
