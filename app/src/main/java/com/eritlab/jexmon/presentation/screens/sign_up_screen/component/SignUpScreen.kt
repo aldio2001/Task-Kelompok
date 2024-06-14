@@ -12,6 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -31,6 +32,7 @@ import com.eritlab.jexmon.presentation.graphs.auth_graph.AuthScreen
 import com.eritlab.jexmon.presentation.ui.theme.PrimaryColor
 import com.eritlab.jexmon.presentation.ui.theme.PrimaryLightColor
 import com.eritlab.jexmon.presentation.ui.theme.TextColor
+import com.eritlab.jexmon.utils.SharedPreferencesManager
 
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -43,6 +45,7 @@ fun SignUpScreen(navController: NavController) {
     var lastName by remember { mutableStateOf(TextFieldValue("")) }
     var phoneNumber by remember { mutableStateOf(TextFieldValue("")) }
     var address by remember { mutableStateOf(TextFieldValue("")) }
+
     val emailErrorState = remember { mutableStateOf(false) }
     val passwordErrorState = remember { mutableStateOf(false) }
     val conPasswordErrorState = remember { mutableStateOf(false) }
@@ -52,6 +55,7 @@ fun SignUpScreen(navController: NavController) {
     val addressErrorState = remember { mutableStateOf(false) }
     val animate = remember { mutableStateOf(true) }
 
+    val sharedPreferencesManager = SharedPreferencesManager.getInstance(LocalContext.current)
 
     AnimatedContent(targetState = animate.value, transitionSpec = {
         slideInHorizontally(
@@ -146,7 +150,7 @@ fun SignUpScreen(navController: NavController) {
                     ErrorSuggestion("Please enter valid email address.")
                 }
                 if (passwordErrorState.value) {
-                    Row() {
+                    Row {
                         ErrorSuggestion("Please enter valid password.")
                     }
                 }
@@ -163,6 +167,8 @@ fun SignUpScreen(navController: NavController) {
                     passwordErrorState.value = !isPassValid
                     conPasswordErrorState.value = !conPassMatch
                     if (isEmailValid && isPassValid && conPassMatch) {
+                        sharedPreferencesManager.email = email.text
+                        sharedPreferencesManager.password = password.text
                         animate.value = !animate.value
                     }
                 }
@@ -366,11 +372,17 @@ fun SignUpScreen(navController: NavController) {
                     val isFNameValid = firstName.text.isEmpty() || firstName.text.length < 3
                     val isLNameValid = lastName.text.isEmpty() || lastName.text.length < 3
                     val isAddressValid = address.text.isEmpty() || address.text.length < 5
+
+                    phoneNumberErrorState.value = !isPhoneValid
                     firstNameErrorState.value = !isFNameValid
                     lastNameErrorState.value = !isLNameValid
                     addressErrorState.value = !isAddressValid
-                    phoneNumberErrorState.value = !isPhoneValid
+
                     if (!isFNameValid && !isLNameValid && !isAddressValid && !isPhoneValid) {
+                        sharedPreferencesManager.firstName = firstName.text
+                        sharedPreferencesManager.lastName = lastName.text
+                        sharedPreferencesManager.phoneNumber = phoneNumber.text
+                        sharedPreferencesManager.address = address.text
                         navController.navigate(AuthScreen.OTPScreen.route)
                     }
                 }
